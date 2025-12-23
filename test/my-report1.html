@@ -344,7 +344,7 @@ tbody tr:last-child td {
   <div class="header">
     <div class="header-content">
       <h1>Vue AST 分析报告</h1>
-      <p>分析时间: 2025/12/23 16:11:04</p>
+      <p>分析时间: 2025/12/23 16:34:57</p>
     </div>
   </div>
   
@@ -426,21 +426,9 @@ function formatList(items) {
   }).join('');
 }
 
-// 添加复制到剪贴板功能
-function copyToClipboard(text) {
-  const textarea = document.createElement('textarea');
-  textarea.value = text;
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand('copy');
-  document.body.removeChild(textarea);
-  alert('文件路径已复制到剪贴板！');
-}
-
-  data.forEach(item => {
-    const tr = document.createElement('tr');
-    // 显示文件路径和复制按钮
-    tr.innerHTML = '<td style="font-weight: 500; display: flex; align-items: center; gap: 8px;"><span style="color: #475569;">' + item.file + '</span><button onclick="copyToClipboard('' + item.file + '')" style="background-color: #667eea; color: white; border: none; border-radius: 4px; padding: 4px 8px; font-size: 12px; cursor: pointer; transition: background-color 0.2s ease;">复制路径</button></td>' +
+data.forEach(item => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = '<td style="font-weight: 500; color: #475569;">' + item.file + '</td>' +
     '<td class="list">' + formatList(item.interpolations) + '</td>' +
     '<td class="list">' + formatList(item.vFors) + '</td>' +
     '<td class="list">' + formatList(item.vIfs) + '</td>' +
