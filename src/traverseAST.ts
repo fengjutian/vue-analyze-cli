@@ -95,7 +95,7 @@ export function traverseAST(node: any, info: TemplateInfo): void {
     // 处理 slot 标签
     if (node.tag === 'slot') {
       // 查找 name 属性
-      const nameProp = node.props?.find((p: any) => 
+      const nameProp = node.props?.find((p: any) =>
         p.type === NodeTypes.ATTRIBUTE && p.name === 'name'
       )
       // 如果有 name 属性则使用指定名称，否则使用默认名称
