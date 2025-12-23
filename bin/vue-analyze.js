@@ -45,6 +45,8 @@ if (!fs.existsSync(projectPath)) {
 }
 
 console.log(`开始分析项目: ${projectPath}`)
+
+// 分析项目（容错版，记录解析错误文件）
 const report = analyzeProject(projectPath)
 
 // 生成 HTML 报告
@@ -61,3 +63,9 @@ if (!fs.existsSync(jsonOutputDir)) {
 const finalJsonPath = ensureUniqueFileName(outputJsonPath)
 fs.writeFileSync(finalJsonPath, JSON.stringify(report, null, 2), 'utf-8')
 console.log(`JSON 报告生成: ${finalJsonPath}`)
+
+console.log(`分析完成，共解析文件: ${report?.files?.length || 0}`)
+if (report?.errors?.length) {
+  console.warn(`有 ${report.errors.length} 个文件解析失败，请检查 JSON 或 HTML 报告: `)
+  report.errors.forEach(err => console.warn(`- ${err.file}: ${err.message}`))
+}
