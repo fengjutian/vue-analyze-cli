@@ -14,15 +14,6 @@ const __dirname = path.dirname(__filename)
 // 默认JSON报告存储目录
 const DEFAULT_JSON_DIR = path.resolve(__dirname, '../ast-json')
 
-// 生成带时间戳的文件名
-// function getFileNameWithTimestamp(filePath) {
-//   const dir = path.dirname(filePath)
-//   const ext = path.extname(filePath)
-//   const base = path.basename(filePath, ext)
-//   const timestamp = new Date().toISOString().replace(/:/g, '-').slice(0, 19)
-//   return path.join(dir, `${base}-${timestamp}${ext}`)
-// }
-
 // 如果文件已存在，则直接删除
 function ensureUniqueFileName(filePath) {
   if (fs.existsSync(filePath)) {
