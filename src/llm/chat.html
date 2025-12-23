@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue项目分析 - AI助手</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .header h1::before {
+            content: '🤖';
+            font-size: 1.8rem;
+        }
+
+        .upload-section {
+            padding: 20px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 12px;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .upload-btn:active {
+            transform: translateY(0);
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        .file-info {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            font-size: 14px;
+            color: #64748b;
+            display: inline-block;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .chat-container {
+            height: calc(100vh - 280px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.ai {
+            align-self: flex-start;
+            background: #f1f5f9;
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.system {
+            align-self: center;
+            background: #e2e8f0;
+            color: #64748b;
+            font-size: 14px;
+            padding: 8px 16px;
+            border-radius: 12px;
+        }
+
+        .message .timestamp {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .message.ai .timestamp {
+            text-align: left;
+        }
+
+        .input-section {
+            padding: 20px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        #message-input {
+            flex: 1;
+            min-height: 48px;
+            max-height: 120px;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        #message-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            align-self: flex-end;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 滚动条样式 */
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                min-height: 100vh;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .message {
+                max-width: 85%;
+                font-size: 14px;
+            }
+
+            .chat-messages {
+                padding: 15px;
+            }
+
+            .input-section {
+                padding: 15px;
+            }
+
+            .input-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .send-btn {
+                align-self: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Vue项目分析 - AI助手</h1>
+        </div>
+
+        <div class="upload-section">
+            <button class="upload-btn" onclick="document.getElementById('file-input').click()">
+                📁 上传Vue项目分析JSON文件
+            </button>
+            <input type="file" id="file-input" accept=".json" onchange="handleFileUpload(event)">
+            <div id="file-info" class="file-info" style="display: none;"></div>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+                <div class="message system">
+                    欢迎使用Vue项目分析AI助手！请上传您的项目分析JSON文件，然后开始提问。
+                </div>
+            </div>
+
+            <div class="input-section">
+                <div class="input-container">
+                    <textarea id="message-input" placeholder="请输入您的问题..."></textarea>
+                    <button class="send-btn" onclick="sendMessage()">发送</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let uploadedData = null;
+        let isLoading = false;
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    uploadedData = JSON.parse(e.target.result);
+                    const fileInfo = document.getElementById('file-info');
+                    fileInfo.textContent = `已上传: ${file.name}`;
+                    fileInfo.style.display = 'block';
+                    
+                    addMessage('system', `✅ 文件已成功上传！\n\n已加载项目分析数据，包含 ${uploadedData.length} 个文件。\n\n您可以开始提问关于项目结构、指令使用、组件分析等问题。`);
+                } catch (error) {
+                    addMessage('system', `❌ 文件解析失败: ${error.message}`);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function addMessage(role, content) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.textContent = content;
+            
+            const timestampDiv = document.createElement('div');
+            timestampDiv.className = 'timestamp';
+            timestampDiv.textContent = new Date().toLocaleTimeString('zh-CN', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            messageDiv.appendChild(contentDiv);
+            messageDiv.appendChild(timestampDiv);
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            if (isLoading) return;
+
+            addMessage('user', message);
+            input.value = '';
+            
+            // 如果没有上传数据，提示用户
+            if (!uploadedData) {
+                addMessage('system', '⚠️ 请先上传Vue项目分析JSON文件');
+                return;
+            }
+
+            isLoading = true;
+            const sendBtn = document.querySelector('.send-btn');
+            const originalText = sendBtn.textContent;
+            sendBtn.innerHTML = '<div class="loading"></div>';
+            sendBtn.disabled = true;
+
+            // 模拟API调用
+            setTimeout(() => {
+                const response = generateMockResponse(message, uploadedData);
+                addMessage('ai', response);
+                
+                isLoading = false;
+                sendBtn.textContent = originalText;
+                sendBtn.disabled = false;
+            }, 1500);
+        }
+
+        function generateMockResponse(message, data) {
+            // 简单的关键词匹配来生成模拟响应
+            const lowerMessage = message.toLowerCase();
+            
+            if (lowerMessage.includes('文件数') || lowerMessage.includes('多少个文件')) {
+                return `项目中共有 ${data.length} 个文件被分析。\n\n这些文件包含了各种Vue组件，每个文件都分析了其模板中的指令使用情况。`;
+            }
+            
+            if (lowerMessage.includes('v-for') || lowerMessage.includes('循环')) {
+                const totalVFor = data.reduce((sum, item) => sum + item.vFors.length, 0);
+                return `整个项目中总共使用了 ${totalVFor} 个 v-for 指令。\n\nv-for 指令主要用于列表渲染，是Vue中常用的循环指令。`;
+            }
+            
+            if (lowerMessage.includes('v-if') || lowerMessage.includes('条件')) {
+                const totalVIf = data.reduce((sum, item) => sum + item.vIfs.length, 0);
+                const totalVElseIf = data.reduce((sum, item) => sum + item.vElseIfs.length, 0);
+                const totalVElse = data.reduce((sum, item) => sum + item.vElses, 0);
+                return `项目中条件渲染指令使用情况：\n- v-if: ${totalVIf} 个\n- v-else-if: ${totalVElseIf} 个\n- v-else: ${totalVElse} 个\n\n这些指令用于根据条件动态渲染DOM元素。`;
+            }
+            
+            if (lowerMessage.includes('v-model') || lowerMessage.includes('双向绑定')) {
+                const totalVModel = data.reduce((sum, item) => sum + item.vModels.length, 0);
+                return `项目中总共使用了 ${totalVModel} 个 v-model 指令，用于实现表单元素的双向数据绑定。\n\nv-model 是Vue中实现数据双向绑定的核心指令，简化了表单处理逻辑。`;
+            }
+            
+            if (lowerMessage.includes('组件') || lowerMessage.includes('components')) {
+                const components = new Set(data.flatMap(item => item.components));
+                return `项目中总共使用了 ${components.size} 个不同的组件。\n\n这些组件可能包括Vue内置组件和自定义组件，体现了项目的模块化程度。`;
+            }
+            
+            if (lowerMessage.includes('插值') || lowerMessage.includes('{{')) {
+                const totalInterpolations = data.reduce((sum, item) => sum + item.interpolations.length, 0);
+                return `项目中总共使用了 ${totalInterpolations} 个插值表达式（{{ }}）。\n\n插值表达式是Vue中最基本的数据绑定方式，用于将数据渲染到模板中。`;
+            }
+            
+            if (lowerMessage.includes('v-bind') || lowerMessage.includes('绑定')) {
+                const totalVBind = data.reduce((sum, item) => sum + item.vBinds.length, 0);
+                return `项目中总共使用了 ${totalVBind} 个 v-bind 指令。\n\nv-bind 用于动态绑定HTML属性，可以缩写为 :attribute。`;
+            }
+            
+            if (lowerMessage.includes('v-on') || lowerMessage.includes('事件') || lowerMessage.includes('@')) {
+                const totalVOn = data.reduce((sum, item) => sum + item.vOns.length, 0);
+                return `项目中总共使用了 ${totalVOn} 个 v-on 指令。\n\nv-on 用于监听DOM事件，可以缩写为 @event，是Vue事件处理的核心。`;
+            }
+            
+            return `我理解您的问题："${message}"\n\n基于您上传的项目分析数据，我可以提供以下信息：\n- 总文件数: ${data.length}\n- 总插值表达式: ${data.reduce((sum, item) => sum + item.interpolations.length, 0)}\n- 总v-for指令: ${data.reduce((sum, item) => sum + item.vFors.length, 0)}\n- 总v-if指令: ${data.reduce((sum, item) => sum + item.vIfs.length, 0)}\n- 总v-model指令: ${data.reduce((sum, item) => sum + item.vModels.length, 0)}\n- 总组件数: ${new Set(data.flatMap(item => item.components)).size}\n\n您可以针对这些方面提出更具体的问题。`;
+        }
+
+        // 监听回车键发送消息
+        document.getElementById('message-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
