@@ -3,7 +3,8 @@
 import path from 'path'
 import { Command } from 'commander'
 import fs from 'fs-extra'
-import { analyzeProject, generateHtmlReport } from '../dist/analyzer.js'
+import { analyzeProject } from '../dist/analyzer.js'
+import { generateHtmlReport } from '../dist/generateHtmlReport.js'
 
 const program = new Command()
 
