@@ -56,10 +56,10 @@ export function analyzeVueFile(filePath: string): TemplateInfo {
  */
 export function analyzeProject(projectPath: string): TemplateInfo[] {
   // 查找项目中所有 Vue 文件（排除 node_modules）
-  const files = glob.sync('**/*.vue', { 
-    cwd: projectPath, 
-    absolute: true, 
-    ignore: 'node_modules/**' 
+  const files = glob.sync('**/*.vue', {
+    cwd: projectPath,
+    absolute: true,
+    ignore: 'node_modules/**'
   })
   
   // 分析每个 Vue 文件
