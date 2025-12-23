@@ -1,11 +1,5 @@
 import fs from 'fs-extra'
-
-export interface TemplateInfo {
-  file: string
-  interpolations: string[]
-  vFors: string[]
-  vIfs: string[]
-}
+import type { TemplateInfo } from './type.d'
 
 export function generateHtmlReport(report: TemplateInfo[], outputPath: string) {
   const html = `
