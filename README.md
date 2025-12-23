@@ -36,7 +36,7 @@ vue-analyze
 ### 自定义路径
 
 ```bash
-vue-analyze -p ./my-vue-project -o ./my-report.html
+vue-analyze -p ./test -o ./my-report.html
 ```
 
 ### 命令行选项

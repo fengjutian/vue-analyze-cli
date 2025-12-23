@@ -6,7 +6,20 @@ import { traverseAST } from './traverseAST';
 export function analyzeVueFile(filePath) {
     const code = fs.readFileSync(filePath, 'utf-8');
     const { descriptor } = parseSFC(code);
-    const info = { file: filePath, interpolations: [], vFors: [], vIfs: [], vElseIfs: [], vElses: 0, vBinds: [], vOns: [], vModels: [], components: [], slots: [], customDirectives: [] };
+    const info = {
+        file: filePath,
+        interpolations: [],
+        vFors: [],
+        vIfs: [],
+        vElseIfs: [],
+        vElses: 0,
+        vBinds: [],
+        vOns: [],
+        vModels: [],
+        components: [],
+        slots: [],
+        customDirectives: []
+    };
     if (descriptor.template?.content) {
         const ast = baseParse(descriptor.template.content);
         traverseAST(ast, info);
