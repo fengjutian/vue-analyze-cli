@@ -1,2 +1,4 @@
 node_modules/**
 dist/**
+ast-json/**
+test/**
