@@ -1,5 +1,4 @@
 import fs from 'fs-extra'
-import path from 'path'
 import * as glob from 'glob'
 import { parse as parseSFC } from '@vue/compiler-sfc'
 import { baseParse, NodeTypes } from '@vue/compiler-dom'
