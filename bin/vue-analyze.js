@@ -12,7 +12,25 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 // 默认JSON报告存储目录
-const DEFAULT_JSON_DIR = path.resolve(__dirname, '../src/llm')
+const DEFAULT_JSON_DIR = path.resolve(__dirname, '../ast-json')
+
+// 生成带时间戳的文件名
+function getFileNameWithTimestamp(filePath) {
+  const dir = path.dirname(filePath)
+  const ext = path.extname(filePath)
+  const base = path.basename(filePath, ext)
+  const timestamp = new Date().toISOString().replace(/:/g, '-').slice(0, 19)
+  return path.join(dir, `${base}-${timestamp}${ext}`)
+}
+
+// 如果文件已存在，则使用带时间戳的文件名
+function ensureUniqueFileName(filePath) {
+  if (fs.existsSync(filePath)) {
+    return getFileNameWithTimestamp(filePath)
+  }
+  return filePath
+}
+
 const DEFAULT_JSON_FILE = path.join(DEFAULT_JSON_DIR, 'vue-analysis-report.json')
 
 const program = new Command()
@@ -39,8 +57,9 @@ console.log(`开始分析项目: ${projectPath}`)
 const report = analyzeProject(projectPath)
 
 // 生成 HTML 报告
-generateHtmlReport(report, outputHtmlPath)
-console.log(`分析完成，HTML 报告生成: ${outputHtmlPath}`)
+const finalHtmlPath = ensureUniqueFileName(outputHtmlPath)
+generateHtmlReport(report, finalHtmlPath)
+console.log(`分析完成，HTML 报告生成: ${finalHtmlPath}`)
 
 // 同时生成 JSON 报告
 // 确保JSON输出目录存在
@@ -48,5 +67,6 @@ const jsonOutputDir = path.dirname(outputJsonPath)
 if (!fs.existsSync(jsonOutputDir)) {
   fs.mkdirSync(jsonOutputDir, { recursive: true })
 }
-fs.writeFileSync(outputJsonPath, JSON.stringify(report, null, 2), 'utf-8')
-console.log(`JSON 报告生成: ${outputJsonPath}`)
+const finalJsonPath = ensureUniqueFileName(outputJsonPath)
+fs.writeFileSync(finalJsonPath, JSON.stringify(report, null, 2), 'utf-8')
+console.log(`JSON 报告生成: ${finalJsonPath}`)
