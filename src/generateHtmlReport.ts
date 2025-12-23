@@ -1,9 +1,19 @@
+/**
+ * HTML 报告生成器
+ * 用于将 Vue 模板分析结果生成美观的 HTML 报告
+ */
 import fs from 'fs-extra'
+import path from 'path'
 import type { TemplateInfo } from './type.d.ts'
 
-export function generateHtmlReport(report: TemplateInfo[], outputPath: string) {
-  const html = `
-<!DOCTYPE html>
+/**
+ * 生成 Vue 模板分析的 HTML 报告
+ * @param report 模板分析结果数组
+ * @param outputPath 报告输出路径
+ */
+export function generateHtmlReport(report: TemplateInfo[], outputPath: string): void {
+  // 生成 HTML 报告内容
+  const html = `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
@@ -28,7 +38,6 @@ body {
 
 /* 容器样式 */
 .container {
-  max-width: 1400px;
   margin: 0 auto;
   background-color: #fff;
   border-radius: 12px;
@@ -453,5 +462,10 @@ data.forEach(item => {
 </html>
   `
   
+  // 确保输出目录存在
+  const outputDir = path.dirname(outputPath)
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true })
+  }
   fs.writeFileSync(outputPath, html)
 }

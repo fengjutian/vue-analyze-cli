@@ -53,17 +53,30 @@ Options:
 
 ```
 vue-analyze-cli/
-├── bin/
-│   ├── vue-analyze.js      # CLI 入口文件
-│   └── vue-analyze.ts      # CLI 入口文件 (TypeScript 源文件)
-├── src/
-│   ├── analyzer.js         # JavaScript 编译输出
-│   └── analyzer.ts         # TypeScript 源文件
-├── dist/                   # TypeScript 编译输出目录
-├── package.json
-├── tsconfig.json
-└── README.md
+├── bin/                  # CLI 入口目录
+│   └── vue-analyze.js    # CLI 入口文件
+├── src/                  # 源代码目录
+│   ├── analyzer.ts       # 项目分析器
+│   ├── generateHtmlReport.ts  # HTML 报告生成器
+│   ├── traverseAST.ts    # AST 遍历器
+│   └── type.d.ts         # 类型定义
+├── docs/                 # 文档目录
+│   └── principle.md      # 技术原理文档
+├── test/                 # 测试目录
+├── package.json          # 项目配置
+└── tsconfig.json         # TypeScript 配置
 ```
+
+## 技术原理
+
+Vue AST 分析工具通过解析 Vue 模板的抽象语法树（AST），提取模板中的各种信息（如插值表达式、指令、组件、插槽等），并生成美观的 HTML 报告。
+
+详细技术原理请查看 [技术原理文档](docs/principle.md)，其中包含：
+- 项目概述与核心技术栈
+- 工作原理与 AST 遍历机制
+- 报告生成机制与美化
+- 项目架构与扩展性设计
+- 性能优化策略
 
 ## 开发
 
