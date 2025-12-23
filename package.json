@@ -1,0 +1,27 @@
+{
+  "name": "vue-analyze-cli",
+  "version": "1.0.0",
+  "bin": {
+    "vue-analyze": "./bin/vue-analyze.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node bin/vue-analyze.js"
+  },
+  "type": "module",
+  "dependencies": {
+    "@vue/compiler-dom": "^3.4.0",
+    "@vue/compiler-sfc": "^3.4.0",
+    "commander": "^11.1.0",
+    "fs-extra": "^11.3.3",
+    "glob": "^10.5.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/glob": "^8.1.0",
+    "@types/node": "^25.0.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
