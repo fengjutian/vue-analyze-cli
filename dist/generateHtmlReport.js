@@ -24,11 +24,11 @@ tr:hover { background: #f9f9f9; }
 <div class="container">
   <div class="header">
     <h1>Vue AST 分析报告</h1>
-    <p>分析时间: "+new Date().toLocaleString()+"</p>
+    <p>分析时间: ${new Date().toLocaleString()}</p>
   </div>
   
   <div class="summary">
-    <div class="summary-item">总文件数: <span class="count">"+report.length+"</span></div>
+    <div class="summary-item">总文件数: <span class="count">${report.length}</span></div>
   </div>
   
   <table>
@@ -53,7 +53,7 @@ tr:hover { background: #f9f9f9; }
 </div>
 
 <script>
-const data = "+JSON.stringify(report)+";
+const data = ${JSON.stringify(report)};
 const tbody = document.getElementById('table-body');
 
 data.forEach(item => {
